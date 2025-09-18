@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Python Runner & Learning Tool</title>
+<!-- Tailwind for styling -->
+<script src="https://cdn.tailwindcss.com"></script>
+<!-- Monaco Editor CDN -->
+<script src="https://cdn.jsdelivr.net/npm/monaco-editor@0.41.0/min/vs/loader.js"></script>
+<!-- Pyodide -->
+<script src="https://cdn.jsdelivr.net/pyodide/v0.23.4/full/pyodide.js"></script>
+<style>
+    body { margin: 0; font-family: 'Inter', sans-serif; background-color: #1e1e1e; color: #ffffff; }
+    .editor-container, .bash-container { height: 400px; }
+    .console { background-color: #121212; padding: 10px; height: 200px; overflow-y: auto; border-top: 1px solid #333; }
+    .tab { cursor: pointer; padding: 10px 20px; display: inline-block; }
+    .tab.active { border-bottom: 2px solid #4F46E5; color: #4F46E5; }
+    .library-panel { background-color: #1b1b1b; padding: 10px; height: 200px; overflow-y: auto; border-top: 1px solid #333; }
+</style>
+</head>
+<body>
+
+<div class="p-4">
+    <h1 class="text-2xl font-bold mb-4">Python Runner & Learning Tool</h1>
+
+    <!-- Tabs -->
+    <div class="mb-2">
+        <span class="tab active" id="tab-editor">Monaco Editor</span>
+        <span class="tab" id="tab-bash">Python Bash</span>
+    </div>
+
+    <!-- Editor Container -->
+    <div id="editor-container" class="editor-container mb-2"></div>
+
+    <!-- Bash Container -->
+    <textarea id="bash-container" class="bash-container hidden w-full p-2 bg-gray-900 text-white font-mono"></textarea>
+
+    <!-- Run Button -->
+    <button id="run-btn" class="bg-indigo-600 hover:bg-indigo-700 px-4 py-2 rounded mt-2">Run Code</button>
+
+    <!-- Console Output -->
+    <div id="console" class="console mt-2"></div>
+
+    <!-- Python Library / Commands Panel -->
+    <div class="library-panel mt-2">
+        <h2 class="font-bold mb-2">Python Learning Guide</h2>
+        <input type="text" id="lib-search" placeholder="Search command/library..." class="w-full p-1 rounded bg-gray-800 text-white mb-2">
+        <div id="lib-content" class="text-sm leading-5"></div>
+    </div>
+</div>
+
+<script>
+let pyodideReady = false;
+let pyodide;
+let editor;
+let currentTab = 'editor';
+
+async function initPyodide() {
+    pyodide = await loadPyodide();
+    pyodideReady = true;
+    appendConsole("Pyodide loaded. Python is ready!");
+}
+
+function appendConsole(text) {
+    const consoleDiv = document.getElementById('console');
+    consoleDiv.innerHTML += text + "<br>";
+    consoleDiv.scrollTop = consoleDiv.scrollHeight;
+}
+
+// Initialize Monaco Editor
+require.config({ paths: { 'vs': 'https://cdn.jsdelivr.net/npm/monaco-editor@0.41.0/min/vs' }});
+require(['vs/editor/editor.main'], function() {
+    editor = monaco.editor.create(document.getElementById('editor-container'), {
+        value: "# Write Python code here\nprint('Hello World')",
+        language: 'python',
+        theme: 'vs-dark',
+        automaticLayout: true
+    });
+});
+
+// Tab switching
+document.getElementById('tab-editor').onclick = () => {
+    currentTab = 'editor';
+    document.getElementById('editor-container').classList.remove('hidden');
+    document.getElementById('bash-container').classList.add('hidden');
+    document.getElementById('tab-editor').classList.add('active');
+    document.getElementById('tab-bash').classList.remove('active');
+};
+document.getElementById('tab-bash').onclick = () => {
+    currentTab = 'bash';
+    document.getElementById('editor-container').classList.add('hidden');
+    document.getElementById('bash-container').classList.remove('hidden');
+    document.getElementById('tab-bash').classList.add('active');
+    document.getElementById('tab-editor').classList.remove('active');
+};
+
+// Run Code
+document.getElementById('run-btn').onclick = async () => {
+    if (!pyodideReady) { appendConsole("Python not ready yet."); return; }
+    let code = currentTab === 'editor' ? editor.getValue() : document.getElementById('bash-container').value;
+    try {
+        let result = await pyodide.runPythonAsync(code);
+        appendConsole(result === undefined ? "Code executed." : result);
+    } catch(err) {
+        appendConsole(err);
+    }
+};
+
+// Python Libraries / Commands Data
+const pythonLibs = {
+    "print": "print(*objects, sep=' ', end='\\n') → Prints objects to the console.",
+    "len": "len(s) → Returns the number of items in a sequence or collection.",
+    "list": "list(iterable) → Creates a list from an iterable.",
+    "dict": "dict(**kwargs) → Creates a dictionary.",
+    "import": "import module → Imports a Python module.",
+    "for": "for x in iterable: ... → Loop over items.",
+    "if": "if condition: ... → Conditional statement.",
+    "def": "def function_name(params): ... → Define a function.",
+    "class": "class ClassName: ... → Define a class.",
+    "range": "range(start, stop, step) → Generates numbers in a range.",
+    "sum": "sum(iterable) → Returns sum of elements.",
+    "min": "min(iterable) → Returns minimum element.",
+    "max": "max(iterable) → Returns maximum element.",
+    "import math": "Provides math functions like sqrt(), sin(), cos(), pi, etc.",
+    "import os": "Provides OS functions like os.listdir(), os.getcwd(), etc.",
+    "import sys": "Provides system-related info like sys.argv, sys.version, etc."
+};
+
+// Search library commands
+document.getElementById('lib-search').addEventListener('input', function() {
+    const query = this.value.toLowerCase();
+    const contentDiv = document.getElementById('lib-content');
+    contentDiv.innerHTML = '';
+    for (let key in pythonLibs) {
+        if (key.toLowerCase().includes(query) || pythonLibs[key].toLowerCase().includes(query)) {
+            contentDiv.innerHTML += `<b>${key}</b>: ${pythonLibs[key]}<br>`;
+        }
+    }
+});
+
+// Initialize Pyodide
+initPyodide();
+</script>
+</body>
+</html>
