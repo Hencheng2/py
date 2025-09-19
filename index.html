@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Python Master</title>
+    <title>Python Skills</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.34.1/min/vs/loader.js"></script>
     <script src="https://skulpt.org/js/skulpt.min.js"></script>
@@ -45,6 +45,7 @@
             border-radius: 12px;
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
             flex-shrink: 0;
+            position: relative;
         }
         
         h1 {
@@ -59,6 +60,27 @@
         .subtitle {
             font-size: 0.9rem;
             color: #8b9dc3;
+        }
+        
+        .back-button {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            background: darkgreen;
+            color: white;
+            padding: 8px 12px;
+            border-radius: 6px;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.3s ease;
+        }
+        
+        .back-button:hover {
+            background: #006400;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
         }
         
         .main-content {
@@ -289,6 +311,9 @@
 <body>
     <div class="container">
         <header>
+            <a href="https://hencheng2.github.io/all/" class="back-button">
+                <i class="fas fa-arrow-left"></i> Back
+            </a>
             <h1><i class="fas fa-code"></i> Python Master</h1>
             <p class="subtitle">Interactive Python Learning Environment</p>
         </header>
@@ -433,7 +458,7 @@ print(message)</pre>
                                 <li><strong>Parameters:</strong> Default values: <code>def func(param=default)</code></li>
                                 <li><strong>Lambda:</strong> Small anonymous functions: <code>lambda x: x*2</code></li>
                             </ul>
-                            
+                �
                             <div class="examples">
                                 <div class="example-btn" onclick="loadExample('function_basic')">Basic Function</div>
                                 <div class="example-btn" onclick="loadExample('lambda_example')">Lambda</div>
